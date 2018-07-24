@@ -74,8 +74,8 @@ component Registrador2
 end component	
 
 signal
- Re0,Re1,Re2,Re3 : std_logic_vector (4 downto 0);  -- signal de saida do registrador.
- A, B, C, D      : std_logic_vector (4 downto 0);  -- signal de entrada da primeira operação.
+ Re0,Re1,Re2,Re3 											 : std_logic_vector (4 downto 0);  -- signal de saida do registrador.
+ A, A_temp, B, B_temp, C, C_temp, D, D_temp      : std_logic_vector (4 downto 0);  -- signal de entrada da primeira operação.
  W0, W1, W2, W3  : std_logic_vector (5 downto 0);  -- signal de entrada da segunda operação.
  I0, I1, I2, I3  : std_logic_vector (5 downto 0); 	-- signal de entrada do contador.
  J0, J1, J2, J3  : std_logic_vector (5 downto 0);	-- signal de entrada do mux.
@@ -90,15 +90,30 @@ signal
  
 begin
 	-- Equações das entradas das metrizes HT*HT^-1
-	Re0 + Re2 = A;
-	Re0 - Re2 = C;
-	Re2 + Re4 = B;
-	Re2 - Re4 = D;
+	-- Concatenação das entradas.
 	
-	A + B = W0;
-	A - B = W2;
-	C + D = W1;
-	C - D = W3;
+	Re0_temp <= ('0' & Re0);
+	Re1_temp <= ('0' & Re1);
+	Re2_temp <= ('0' & Re2);
+	Re3_temp <= ('0' & Re3);
+	
+	A <= Re0_temp + Re1_temp;
+	C <= Re0_temp - Re1_temp;
+	B <= Re2_temp + Re3_temp;
+	D <= Re2_temp - Re3_temp;
+	
+	
+	A_temp <= ('0' & A);
+	B_temp <= ('0' & B);
+	C_temp <= ('0' & C);
+	D_temp <= ('0' & D);
+	
+	W0 <= A_temp + B_temp;
+	W2 <= A_temp - B_temp;
+	W1 <= C_temp + D_temp;
+	W3 <= C_temp - D_temp;
+	
+	
 	
 	-- Ligaçao Start.
 	Start : reg_inicial port map (Reg_entrada => Y11 , Reg_saida => Re0, Clk => Clk
@@ -115,7 +130,7 @@ begin
 	
 	--Ligação mux 4x1 com registrador 1.	
 	Mux4x1 : Mux port map ( M0 => J0,	Saida_mux => K, Clk => Clk); 
-   Mux4x1 : Mux port map ( M1 => J1,	Saida_mux => K, Clk => Clk); 
+        Mux4x1 : Mux port map ( M1 => J1,	Saida_mux => K, Clk => Clk); 
 	Mux4x1 : Mux port map ( M2 => J2,	Saida_mux => K, Clk => Clk); 
 	Mux4x1 : Mux port map ( M3 => J3,	Saida_mux => K, Clk => Clk); 
 
@@ -130,6 +145,3 @@ begin
 	-- Ligaçao registrador realimentaçao
 	Reg2 : Registrador2 port map (R2 => P, Q2 => Z , Clk => Clk);
 	
-	
-
-
