@@ -21,7 +21,7 @@ end maquina_estados;
 architecture hardware of maquina_estados is
 
 type tipo_estado is (estado_ini_1, estado2, estado3, 
-							estado4, estado5, estado6, estado7);	-- declaração dos estados.
+							estado4, estado5, estado6, estado7, estado_extra);	-- declaração dos estados.
 							
 signal estado_atual, proximo_estado: tipo_estado;				-- sinais de estado atual e proximo estado.
 
@@ -51,7 +51,7 @@ end process;
 --     LÓGICA DE PRÓXIMO ESTADO
 --==================================================================
 
-process(estado_atual, start)
+process(estado_atual, start, Clk)
 
 begin
 		
@@ -75,16 +75,23 @@ begin
 		when estado3 =>
 			if ( start = '0') then
 				proximo_estado  <= estado4;
-            else 
+           else
 				proximo_estado <= estado3;
-			end if;
-		
+			end if;		
 			
+		
 		when estado4 =>
 			if ( start = '0') then
-				proximo_estado  <= estado4;
-            else 
-				proximo_estado <= estado4;
+					proximo_estado  <= estado5;
+				else 
+					proximo_estado <= estado_extra;
+			end if;
+
+		when estado_extra =>
+			if ( start = '0') then
+					proximo_estado  <= estado6;
+				else 
+					proximo_estado <= estado7;
 			end if;
 					
 		when estado5 =>
@@ -107,6 +114,8 @@ begin
             else 
 				proximo_estado <= estado7;
 			end if;
+		
+								
 	end case;
 
 end process;
@@ -122,8 +131,8 @@ process(estado_atual)
  begin
 	case estado_atual is
 		
-		when estado_ini_1 =>
-			saidaMSS <= '0';
+			when estado_ini_1 =>
+				saidaMSS <= '0';
 				 
 			when estado2 =>
 				saidaMSS <= '0';
@@ -131,9 +140,6 @@ process(estado_atual)
 			when estado3 =>
 				saidaMSS <= '0';
 		
-			when estado4 =>
-				saidaMSS <= '0';
-			
 			when estado5 =>
 				saidaMSS <= '0';
 		
@@ -141,7 +147,14 @@ process(estado_atual)
 				saidaMSS <= '0';
 				
 			when estado7 =>
-				saidaMSS <= '1';	
+				saidaMSS <= '0';	
+				
+			when estado_extra =>
+				saidaMSS <= '0';				
+			
+		   when estado4 =>
+				saidaMSS <= '1';
+		  		 	
 		
 	end case;
 		
