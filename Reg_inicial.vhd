@@ -30,28 +30,17 @@ begin
 		process(Clk, Clr)
 		begin	
 			if Clr = '1' then
-				Regout0 <= "0000";
-			elsif Clr = '1' then
-				Regout1 <= "0000";
-			elsif Clr = '1' then
-				Regout2 <= "0000";
-			elsif Clr = '1' then
+				Regout0 <= "0000";			
+				Regout1 <= "0000";			
+				Regout2 <= "0000";			
 				Regout3 <= "0000";
 			elsif Clk'event and Clk = '1' then
 				if Load_ini = '1' then
 					Regout0 <=	Regin0;
-				elsif Load_ini = '1' then
-					Regout1 <= Regin1;
-				elsif Load_ini = '1' then
-					Regout2 <= Regin2;
-				elsif Load_ini = '1' then
+					Regout1 <=  Regin1;				
+					Regout2 <=  Regin2;				
 					Regout3 <=	Regin3;
 			   end if;
 			end if;			
 		end process;
 end Reg_inicial;		
-
-
-
-
-
