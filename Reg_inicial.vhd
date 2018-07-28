@@ -18,10 +18,10 @@ use ieee.std_logic_1164.all;
 entity Reg_inicial is
 		port(
 			Load_ini										:	in	std_logic;
-			Regin0, Regin1, Regin2, Regin3		:	in	std_logic_vector(4 downto 0);
+			Regin0, Regin1, Regin2, Regin3		:	in	std_logic_vector(3 downto 0);
 			Clk											:	in	std_logic;
 			Clr											:	in std_logic;
-			Regout0, Regout1, Regout2, Regout3	:	out std_logic_vector(4 downto 0)
+			Regout0, Regout1, Regout2, Regout3	:	out std_logic_vector(3 downto 0)
 			);
 end Reg_inicial; 
 
@@ -30,13 +30,13 @@ begin
 		process(Clk, Clr)
 		begin	
 			if Clr = '1' then
-				Regout0 <= "00000";
+				Regout0 <= "0000";
 			elsif Clr = '1' then
-				Regout1 <= "00000";
+				Regout1 <= "0000";
 			elsif Clr = '1' then
-				Regout2 <= "00000";
+				Regout2 <= "0000";
 			elsif Clr = '1' then
-				Regout3 <= "00000";
+				Regout3 <= "0000";
 			elsif Clk'event and Clk = '1' then
 				if Load_ini = '1' then
 					Regout0 <=	Regin0;
