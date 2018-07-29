@@ -28,18 +28,18 @@ end component;
 
 component contador -- Contador do valor absoluto.
 		port (
-				ABSS 						  : out std_logic_vector ( 5 downto 0 );
+				ABSS0, ABSS1 						  : buffer std_logic_vector ( 1 downto 0 )
 --				creset 					  : in std_logic;	
 --				cload 					  : in std_logic;	
-				X 					        : in std_logic_vector ( 5 downto 0);
-				Clk                    : in std_logic				
+--				X 					        : in std_logic;
+--				Clk                    : in std_logic				
 				);
 end component;
 
 component MUX 	
 		port (M0, M1 , M2, M3          : in std_logic_vector (5 downto 0);
-				Saida_mux 		 			 : out std_logic_vector (5 downto 0 )
---				SelMux0, SelMux1			 : in std_logic_vector (1 downto 0)
+				Saida_mux 		 			 : out std_logic_vector (5 downto 0 );
+				SelMux0, SelMux1			 : in std_logic_vector (1 downto 0)
 				);
 end component;
 
@@ -87,9 +87,13 @@ end component;
  --signal Z					  										  : std_logic_vector (5 downto 0);
  signal Clk 														  		: std_logic;
  signal reg_cont0, reg_cont1, reg_cont2, reg_cont3				: std_logic_vector (5 downto 0);  -- W0,W1,W2,W3 para entrador do ABSS(contador).
--- Load_ini		  : std_logic;								-- 
+-- Load_ini		  : std_logic;								
+signal cont_selmux0, cont_selmux1									: std_logic_vector (1 downto 0);  -- signal para seletora do MUX.
+signal bitt																	: bit;
  --Load1			  : std_logic;								--.
  --Load2			  : std_logic; 							-- .
+ 
+ 
  
  
  begin
@@ -133,26 +137,26 @@ end component;
 											);	
 											
    --	Ligação Registrador_inicial com o contador.
-		I0 <= W0;
-		I1 <= W1;
-		I2 <= W2;
-		I3 <= W3;
+		J0 <= W0;
+		J1 <= W1;
+		J2 <= W2;
+		J3 <= W3;
 
 	-- Ligação contador absoluto com mux 4x1.
 	-- Port map para ligação Contador para Mux.
-	ContadorABS : contador port map (X(0) => I0(0), ABSS(0) => J0(0),
-											   X(1) => I1(1), ABSS(1) => J1(1),
-											   X(2) => I2(2), ABSS(2) => J2(2),
-												X(3) => I3(3), ABSS(3) => J3(3), 
-												Clk => Clk
-												);
+	ContadorABS : contador port map (
+												ABSS0 => cont_selmux0,
+												ABSS1 => cont_selmux1
+											  	);
 	
 	--Ligação saida mux com somador.
 	-- Port map Mux para Somador A.
 	Mux4x1 : Mux port map ( M0 => J0,	Saida_mux(0) => K(0), 
 									M1 => J1,	Saida_mux(1) => K(1),
 									M2 => J2,	Saida_mux(2) => K(2), 
-									M3 => J3,	Saida_mux(3) => K(3)
+									M3 => J3,	Saida_mux(3) => K(3),
+									SelMux0 => cont_selmux0,
+									SelMux1 => cont_selmux1
 									); 
 	
 	-- Ligaçao somador com registrador 1.
