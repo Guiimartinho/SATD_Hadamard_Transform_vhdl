@@ -20,20 +20,19 @@ architecture comportamento of Funcao_SATD is
 component Reg_inicial 																					-- Registrador de Start.
 		port (Regin0, Regin1, Regin2, Regin3 		: in std_logic_vector(3 downto 0);
 				Regout0,Regout1,Regout2,Regout3  	: out std_logic_vector(3 downto 0);
---				Load_ini										: in std_logic;	
-				Clk                                 : in std_logic
---				Clr											: in std_logic
+				Load_ini										: in std_logic;	
+				Clk                                 : in std_logic;
+				Clr											: in std_logic
 				);
 end component;
 
 component contador -- Contador do valor absoluto.
-		port (
-				ABSS0, ABSS1 						  : buffer std_logic_vector ( 1 downto 0 )
---				creset 					  : in std_logic;	
---				cload 					  : in std_logic;	
---				X 					        : in std_logic;
---				Clk                    : in std_logic				
-				);
+		port ( Clk 				: in std_logic ;
+				Clrcount 		: in std_logic ;				-- Entradas do contador
+				X					: in std_logic;
+				ABSS1, ABSS0 	: buffer std_logic_vector(1 downto 0)
+				);				
+				
 end component;
 
 component MUX 	
@@ -46,9 +45,9 @@ end component;
 component Registrador1
 		port (Reg1in   : in std_logic_vector ( 5 downto 0);
 				Reg1out  : out std_logic_vector (5 downto 0);
---				Load1    : in std_logic;
-				Clk      : in std_logic
---				Clr      : in std_logic		
+				Load1    : in std_logic;
+				Clk      : in std_logic;
+				Clr      : in std_logic		
 				);								
 end component;
 
@@ -62,10 +61,26 @@ end component;
 component Registrador2
 		port (Reg2in   : in std_logic_vector ( 5 downto 0);
 				Reg2out  : out std_logic_vector (5 downto 0);
---				Load2    : in std_logic;
-				Clk      : in std_logic
---				Clr      : in std_logic
+				Load2    : in std_logic;
+				Clk      : in std_logic;
+				Clr      : in std_logic
 				);				
+end component;
+
+component maquina_estados_Funcao_SATD
+		 port (
+          Clk  		  	  : in std_logic; 			-- sinal de clock.
+ --         start   		  : in std_logic;				-- inicio do sistema.
+          Reg_Ini_Load    : out std_logic;			-- saida para o Load Register inicial.
+			 Clr_Reg_Ini	  : out std_logic;			-- clear para o Registrador inicial.
+			 Counter_saida	  : out std_logic;			-- saida para o contador.
+			 Clr_Counter	  : out std_logic;			-- clear para o contador.
+			 Reg_Load_1	     : out std_logic;			-- saida para o Load registrador 1.
+			 Clr_Reg_1		  : out std_logic;			-- clear para o registrador 1.
+			 Reg_Load_2		  : out std_logic;			-- saida para o Load registrador 2.	
+			 Clr_Reg_2		  : out std_logic				-- clear para o registrador 2.
+          );
+
 end component;
 
 
@@ -84,14 +99,26 @@ end component;
  signal K               										  		: std_logic_vector (5 downto 0);  -- signal de entrada do SomaA.
  signal O															  		: std_logic_vector (5 downto 0);  -- signal de entrada do registrador 1.
  signal P													  	     		: std_logic_vector (5 downto 0);  -- 
- --signal Z					  										  : std_logic_vector (5 downto 0);
  signal Clk 														  		: std_logic;
  signal reg_cont0, reg_cont1, reg_cont2, reg_cont3				: std_logic_vector (5 downto 0);  -- W0,W1,W2,W3 para entrador do ABSS(contador).
--- Load_ini		  : std_logic;								
-signal cont_selmux0, cont_selmux1									: std_logic_vector (1 downto 0);  -- signal para seletora do MUX.
-signal bitt																	: bit;
- --Load1			  : std_logic;								--.
- --Load2			  : std_logic; 							-- .
+ signal cont_selmux0, cont_selmux1									: std_logic_vector (1 downto 0);  -- signal para seletora do MUX.
+ signal bitt																: std_logic;
+ 
+ 
+ -- Signals da FSM
+ signal Signal_Reg_Load_ini		   : std_logic;		
+ signal Signal_Clr_Load_ini		   : std_logic;
+ 
+ signal Signal_Reg_Load1			   : std_logic;
+ signal Signal_Clr_Load1   			: std_logic;
+ 
+ signal Signal_Reg_Load2			   : std_logic;
+ signal Signal_Clr_Load2  				: std_logic;
+ 
+ signal signal_counter					: std_logic;
+ signal signal_clr_counter				: std_logic;
+ 
+
  
  
  
@@ -132,7 +159,9 @@ signal bitt																	: bit;
 	Start : Reg_inicial port map (Regin0 => ini0, Regout0 => Re0_tempOut,		
 											Regin1 => ini1, Regout1 => Re1_tempOut,		
 											Regin2 => ini2, Regout2 => Re2_tempOut,		
-											Regin3 => ini3, Regout3 => Re3_tempOut, 
+											Regin3 => ini3, Regout3 => Re3_tempOut,
+											Load_ini => Signal_Reg_Load_ini,
+											Clr => Signal_Clr_Load_ini,
 											Clk => CLk
 											);	
 											
@@ -146,7 +175,10 @@ signal bitt																	: bit;
 	-- Port map para ligação Contador para Mux.
 	ContadorABS : contador port map (
 												ABSS0 => cont_selmux0,
-												ABSS1 => cont_selmux1
+												ABSS1 => cont_selmux1,
+												X => bitt,
+												Clrcount => signal_clr_counter,
+												Clk => Clk
 											  	);
 	
 	--Ligação saida mux com somador.
@@ -172,14 +204,37 @@ signal bitt																	: bit;
 	-- Port map Registrador 1 para registrador 2.
 	Reg1 : Registrador1 port map (Reg1in(5 downto 0) => O(5 downto 0), 	
 											Reg1out => P,
+											Load1 => Signal_Reg_Load1,
+											Clr => Signal_Clr_Load1,
 											Clk => Clk
 											);	
 	
 	-- Saida registrador 2.	
 	Reg2 : Registrador2 port map (Reg2in => P,
-											Reg2out => SaidaFinal, 
+											Reg2out => SaidaFinal,
+											Load2 => Signal_Reg_Load2,
+											Clr => Signal_Clr_Load2,
 											Clk => Clk
 											);
+											
+	FSM : maquina_estados_Funcao_SATD port map(
+														--	start   		  
+															 Reg_Ini_Load => Signal_Reg_Load_ini,    
+															 Clr_Reg_Ini => Signal_Clr_Load_ini,
+															 
+															 Counter_saida => signal_counter,	  
+															 Clr_Counter => signal_clr_counter,
+															 
+															 Reg_Load_1 => Signal_Reg_Load1,	     
+															 Clr_Reg_1 => Signal_Clr_Load1,
+															 
+															 Reg_Load_2 => Signal_Reg_Load2,		  
+															 Clr_Reg_2 => Signal_Clr_Load2,
+															 
+															 Clk => Clk	
+															);										
+											
+											
 	
 end architecture;	
 	
