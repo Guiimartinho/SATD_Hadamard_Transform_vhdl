@@ -2,7 +2,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
  
-entity contador is
+entity old_contador is
     PORT (
         Clk    : IN  STD_LOGIC;
         creset : IN  STD_LOGIC;
@@ -10,10 +10,10 @@ entity contador is
         X      : IN  STD_LOGIC_VECTOR(5 DOWNTO 0);
         ABSS    : OUT STD_LOGIC_VECTOR(5 DOWNTO 0)
     );
-end contador;
+end old_contador;
  
-architecture Behavioral of contador is
-    -- Señal temporal para el contador.
+architecture Behavioral of old_contador is
+    -- SeÃ±al temporal para el contador.
     signal cnt_tmp: STD_LOGIC_VECTOR(5 DOWNTO 0) := "000000";
 begin
     proceso_contador: process (cload, creset, Clk, X) begin
