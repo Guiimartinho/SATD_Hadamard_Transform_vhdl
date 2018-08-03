@@ -44,3 +44,5 @@ begin
 			end if;			
 		end process;
 end Reg_inicial;		
+
+				
