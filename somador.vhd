@@ -1,11 +1,3 @@
--- Projeto: Somador n bits (Ripple-carry)
-
--- Descrição: Estrutural parametrizada
-
--- Nome: Denis Franco
-
--- Revisão: 2.0 - 22/09/2016
-
 
 
 
@@ -81,7 +73,7 @@ end component;
 
 signal 
 
-	C : std_logic_vector(5 downto 0); -- Sinal de carry interno
+	C : std_logic_vector(6 downto 0); -- Sinal de carry interno
   
 
 begin
@@ -95,7 +87,7 @@ begin
 
 -- Geração automática da cadeia de blocos do somador de n bits 
 
-	Ripple: for k in 0 to 4 generate
+	Ripple: for k in 0 to 5 generate
   
 	FAk : fa port map (SomaA(k), SomaB(k), C(k), saidasoma(k), C(k+1));
 
@@ -103,7 +95,7 @@ end generate;
 
 -- Conexão do carry interno com o carry externo
 
-	carryout <= C(5);
+	carryout <= C(6);
 
 
 end struct;
