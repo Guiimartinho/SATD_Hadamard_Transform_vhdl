@@ -134,6 +134,29 @@ end component;
 	ini3 <= Y22;
 	start_funcao <= Start_SATD;
 	
+	
+--with ini0(3) select
+	--J0 <= ini0               
+	--when '0',
+		--	(not(ini0) + "01") when others;
+			
+	--with ini1(3) select
+	--J1 <= ini1               
+	--when '0',
+		--	(not(ini1) + "01") when others; 		
+			
+--	with ini2(3) select
+--	J2 <= ini2		      	 
+--	when '0',
+--			(not(ini2) + "01") when others; 		
+--			
+--	with ini3(3) select
+--	J3 <= ini3		 	       
+--	when '0',
+--			(not(ini3) + "01") when others; 
+			
+	
+	
 
 	
 	A <= (('0' & Re0_tempOut) + ('0' & Re1_tempOut));  -- Re0_tempOut(4 bits) + Re1_tempOut(4 bits)
@@ -151,7 +174,6 @@ end component;
 	W2 <= (A_temp - B_temp);
 	W1 <= (C_temp + D_temp);
 	W3 <= (C_temp - D_temp);
-	
 	
 	
 	
@@ -179,8 +201,7 @@ end component;
 	ContadorABS : contador port map (
 												ABSS => cont_selmux,
 												X => signal_counter,
-												Clrcount => signal_clr_counter
-																							
+												Clrcount => signal_clr_counter																							
 											  	);
 	
 	--Ligação saida mux com somador.
