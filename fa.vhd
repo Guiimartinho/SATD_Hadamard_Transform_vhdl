@@ -1,11 +1,6 @@
 -- Projeto: Somador completo (Full Adder)
-
--- Descrição: Estrutural
--- Nome: Denis Franco
-
--- Revisão: 1.0 - 01/09/2016
-
-
+--
+--
 -- Declaração da biblioteca do tipo std_logic
 
 
